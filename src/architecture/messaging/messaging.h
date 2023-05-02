@@ -187,7 +187,7 @@ public:
     //! -- request write rights.
     WriteFunctor<messageType> addAuthor();
     //! for plain ole c modules
-    messageType* subscribeRaw(MsgHeader **msgPtr);
+    messageType* subscribeRaw();
 
     //! for plain ole c modules
     messageType* getMsgPayloadPointer();
@@ -218,8 +218,7 @@ WriteFunctor<messageType> Message<messageType>::addAuthor(){
 }
 
 template<typename messageType>
-messageType* Message<messageType>::subscribeRaw(MsgHeader **msgPtr){
-    *msgPtr = &this->header;
+messageType* Message<messageType>::subscribeRaw(){
     this->header.isLinked = 1;
     return &this->payload;
 }
