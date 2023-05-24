@@ -75,14 +75,8 @@ def test_lambertSolver(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_ang
 
     For the multi-revolution case, the solution for the free variable x is also tested.
     """
-    [testResults, testMessages] = lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_angles, p6_align, accuracy)
-    assert testResults < 1, testMessages
-
-
 def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_angles, p6_align, accuracy):
     """This test checks for a large force return when far away from the waypoint"""
-    testFailCount = 0
-    testMessages = []
 
     unitTaskName = "unitTask"
     unitProcessName = "TestProcess"
@@ -237,41 +231,13 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
         xTrue = 0.
         xTrueSol2 = 0.
 
-    # make sure module output data is correct
-    ParamsString = ' for solver=' + p1_solver + ', rev=' + str(p2_revs) + ', time=' + str(p3_times) + ', eccentricity=' + str(p4_eccs) + ', angle=' + str(p5_angles) + ', alignmentThreshold=' + str(p6_align) + ', accuracy=' + str(accuracy)
+    np.testing.assert_allclose(v1True, v1, atol=accuracy, rtol=0, verbose=True)
+    np.testing.assert_allclose(v2True, v2, atol=accuracy, rtol=0, verbose=True)
+    np.testing.assert_equal(np.array([validFlagTrue]), np.array([validFlag]), verbose=True)
+    np.testing.assert_allclose(v1TrueSol2, v1Sol2, atol=accuracy, rtol=0, verbose=True)
+    np.testing.assert_allclose(v2TrueSol2, v2Sol2, atol=accuracy, rtol=0, verbose=True)
+    np.testing.assert_equal(np.array([validFlagTrueSol2]), np.array([validFlagSol2]), verbose=True)
 
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        v1True, v1, accuracy, ('Variable: v1,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        v2True, v2, accuracy, ('Variable: v2,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        np.array([validFlagTrue]), np.array([validFlag]), accuracy, ('Variable: validFlag,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        v1TrueSol2, v1Sol2, accuracy, ('Variable: v1Sol2,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        v2TrueSol2, v2Sol2, accuracy, ('Variable: v2Sol2,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        np.array([validFlagTrueSol2]), np.array([validFlagSol2]), accuracy, ('Variable: validFlagSol2,' + ParamsString),
-        testFailCount, testMessages)
-
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        np.array([xTrue]), np.array([x]), accuracy, ('Variable: x,' + ParamsString),
-        testFailCount, testMessages)
-    testFailCount, testMessages = unitTestSupport.compareDoubleArray(
-        np.array([xTrueSol2]), np.array([xSol2]), accuracy, ('Variable: xSol2,' + ParamsString),
-        testFailCount, testMessages)
-
-    if testFailCount == 0:
-        print("PASSED: " + module.ModelTag)
-    else:
-        print(testMessages)
-
-    return [testFailCount, "".join(testMessages)]
 
 if __name__ == "__main__":
     test_lambertSolver(False, solver[1], revs[0], times[1], eccentricities[1], transferAngle[0], alignmentThreshold[0], 1e-2)
