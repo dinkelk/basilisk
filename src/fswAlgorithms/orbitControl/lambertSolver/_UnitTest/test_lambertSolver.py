@@ -28,7 +28,7 @@ from Basilisk.utilities import macros
 from Basilisk.utilities import orbitalMotion
 from Basilisk.utilities import unitTestSupport
 
-from fswAlgorithms.orbitControl.lambertSolver._UnitTest.Support.IzzoLambert import *
+from Support.IzzoLambert import IzzoSolve
 
 # parameters
 solver = ["Gooding", "Izzo"]
