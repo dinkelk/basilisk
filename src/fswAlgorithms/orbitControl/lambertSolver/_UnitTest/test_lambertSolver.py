@@ -50,9 +50,15 @@ paramList.append((solver[0], revs[0], times[0], eccentricities[0], 1.5, 2.))
 paramList.append((solver[0], revs[0], times[0], eccentricities[0], 2.5, 2.))
 
 @pytest.mark.parametrize("accuracy", [1e-2])
-@pytest.mark.parametrize("p1_solver, p2_revs, p3_times, p4_eccs, p5_angles, p6_align", paramList)
-
-def test_lambertSolver(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_angles, p6_align, accuracy):
+@pytest.mark.parametrize("solverMethod, revolutions, timeOfFlight, ecc, transferAngle, alignmentThreshold", paramList)
+def test_lambertSolver(show_plots,
+                       solverMethod,
+                       revolutions,
+                       timeOfFlight,
+                       ecc,
+                       transferAngle,
+                       alignmentThreshold,
+                       accuracy):
     r"""
     **Validation Test Description**
 
@@ -62,12 +68,12 @@ def test_lambertSolver(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_ang
 
     Args:
         :param show_plots: flag if plots should be shown
-        :param p1_solver: Lambert solver algorithm
-        :param p2_revs: number of revolutions to be completed
-        :param p3_times: time-of-flight (transfer time)
-        :param p4_eccs: eccentricity of transfer orbit
-        :param p5_angles: transfer angle
-        :param p6_align: threshold for transfer angle being considered too small
+        :param solverMethod: Lambert solver algorithm
+        :param revolutions: number of revolutions to be completed
+        :param timeOfFlight: time-of-flight (transfer time)
+        :param ecc: eccentricity of transfer orbit
+        :param transferAngle: transfer angle
+        :param alignmentThreshold: threshold for transfer angle being considered too small
 
     **Description of Variables Being Tested**
 
@@ -75,8 +81,6 @@ def test_lambertSolver(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_ang
 
     For the multi-revolution case, the solution for the free variable x is also tested.
     """
-def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs, p5_angles, p6_align, accuracy):
-    """This test checks for a large force return when far away from the waypoint"""
 
     unitTaskName = "unitTask"
     unitProcessName = "TestProcess"
@@ -89,7 +93,7 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
     # setup module to be tested
     module = lambertSolver.LambertSolver()
     module.ModelTag = "lambertSolver"
-    if p6_align != 1.0:
+    if alignmentThreshold != 1.0:
         # alignmentThreshold equals 1.0 by default so does not have to be specified if equal to 1.0
         module.alignmentThreshold = p6_align
     unitTestSim.AddModelToTask(unitTaskName, module)
@@ -98,13 +102,13 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
     mu = 3.986004418e14
     oe1 = orbitalMotion.ClassicElements()
     r = 10000. * 1000  # meters
-    if p4_eccs < 1.0:
+    if ecc < 1.0:
         # elliptic case
         oe1.a = r
     else:
         # parabolic and hyperbolic case
         oe1.a = -r
-    oe1.e = p4_eccs
+    oe1.e = ecc
     oe1.i = 5. * macros.D2R
     oe1.Omega = 25. * macros.D2R
     oe1.omega = 30. * macros.D2R
@@ -112,22 +116,22 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
     r1_N, v1_N = orbitalMotion.elem2rv_parab(mu, oe1)
 
     oe2 = copy.deepcopy(oe1)
-    oe2.f = oe1.f + p5_angles * macros.D2R
+    oe2.f = oe1.f + transferAngle * macros.D2R
     # Izzo and Gooding Lambert algorithms only consider positive transfer angles. Convert to 0 < angle < 2pi
     oe2.f = (oe2.f*macros.R2D % 360) * macros.D2R
     r2_N, v2_N = orbitalMotion.elem2rv_parab(mu, oe2)
 
     # determine time-of-flight for given transfer orbit and position vectors (true anomalies)
-    if p2_revs > 0:
+    if revolutions > 0:
         # for multi-revolution case use time-of-flight from parameterization
-        t_transfer = p3_times
-    elif p4_eccs < 1.0:
+        t_transfer = timeOfFlight
+    elif ecc < 1.0:
         # elliptic case
-        M1 = orbitalMotion.E2M(orbitalMotion.f2E(oe1.f, p4_eccs), p4_eccs)
-        M2 = orbitalMotion.E2M(orbitalMotion.f2E(oe2.f, p4_eccs), p4_eccs)
+        M1 = orbitalMotion.E2M(orbitalMotion.f2E(oe1.f, ecc), ecc)
+        M2 = orbitalMotion.E2M(orbitalMotion.f2E(oe2.f, ecc), ecc)
         n = np.sqrt(mu/(oe1.a)**3)
         t_transfer = np.abs(M2-M1)/n
-    elif p4_eccs == 1.0:
+    elif ecc == 1.0:
         # parabolic case
         D1 = np.tan(oe1.f/2)
         D2 = np.tan(oe2.f/2)
@@ -137,25 +141,23 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
         t_transfer = np.abs(M2-M1)/n
     else:
         # hyperbolic case
-        N1 = orbitalMotion.H2N(orbitalMotion.f2H(oe1.f, p4_eccs), p4_eccs)
-        N2 = orbitalMotion.H2N(orbitalMotion.f2H(oe2.f, p4_eccs), p4_eccs)
+        N1 = orbitalMotion.H2N(orbitalMotion.f2H(oe1.f, ecc), ecc)
+        N2 = orbitalMotion.H2N(orbitalMotion.f2H(oe2.f, ecc), ecc)
         n = np.sqrt(mu/(-oe1.a)**3)
         t_transfer = np.abs(N2-N1)/n
 
-    solverName = p1_solver
     time = t_transfer
     r1vec = r1_N
     r2vec = r2_N
-    revs = p2_revs
 
     # Configure input messages
     lambertProblemInMsgData = messaging.LambertProblemMsgPayload()
-    lambertProblemInMsgData.solverName = solverName
+    lambertProblemInMsgData.solverName = solverMethod
     lambertProblemInMsgData.r1vec = r1vec
     lambertProblemInMsgData.r2vec = r2vec
     lambertProblemInMsgData.transferTime = time
     lambertProblemInMsgData.mu = mu
-    lambertProblemInMsgData.numRevolutions = revs
+    lambertProblemInMsgData.numRevolutions = revolutions
     lambertProblemInMsg = messaging.LambertProblemMsg().write(lambertProblemInMsgData)
 
     # subscribe input messages to module
@@ -179,21 +181,21 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
     validFlagSol2 = lambertSolutionOutMsgRec.validSol2[0]
 
     # for multi-revolution case, use external Lambert solver
-    if revs > 0 and p5_angles != 180.:
-        Izzo = IzzoSolve(np.array(r1vec), np.array(r2vec), time, mu, revs)
+    if revolutions > 0 and transferAngle != 180.:
+        Izzo = IzzoSolve(np.array(r1vec), np.array(r2vec), time, mu, revolutions)
         Izzo.solve()
         numSolutions = len(Izzo.x)
 
-    idx = 2 * revs - 1
+    idx = 2 * revolutions - 1
     idxSol2 = idx + 1
 
     # if the transfer angle is smaller than alignmentThreshold, the two position vectors are too aligned. They might not define a plane, so no solution should be returned.
-    if abs(np.sin(p5_angles*macros.D2R)) < abs(np.sin(p6_align*macros.D2R)):
+    if abs(np.sin(transferAngle*macros.D2R)) < abs(np.sin(alignmentThreshold*macros.D2R)):
         alignmentFlag = True
     else:
         alignmentFlag = False
 
-    if alignmentFlag or (revs > 0 and idx+1 > numSolutions):
+    if alignmentFlag or (revolutions > 0 and idx+1 > numSolutions):
         # 1. if transfer angle is smaller than alignmentThreshold, no solution should be returned
         # 2. external Lambert solver does not compute solution if requested transfer time is less than minimum time-of-flight for multi-revolution solution. In this case set all true outputs to zero (so does the lambert module as well, since no solution exists for the requested time-of-flight)
         v1True = np.array([0., 0., 0.])
@@ -202,7 +204,7 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
         v1TrueSol2 = np.array([0., 0., 0.])
         v2TrueSol2 = np.array([0., 0., 0.])
         validFlagTrueSol2 = 0
-    elif revs == 0:
+    elif revolutions == 0:
         # for zero-revolution case, obtain true velocity vectors from computed transfer orbit
         v1True = v1_N
         v2True = v2_N
@@ -220,7 +222,7 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
         validFlagTrueSol2 = 1
 
     # only compare solution for free variable x for multi-revolution case (for 0 revolution case, external lambert solver is not called so no true value is available)
-    if (alignmentFlag == False and revs > 0 and idx < numSolutions):
+    if (alignmentFlag == False and revolutions > 0 and idx < numSolutions):
         x = lambertPerformanceOutMsgRec.x[0]
         xSol2 = lambertPerformanceOutMsgRec.xSol2[0]
         xTrue = Izzo.x[idx]
@@ -240,4 +242,11 @@ def lambertSolverTestFunction(show_plots, p1_solver, p2_revs, p3_times, p4_eccs,
 
 
 if __name__ == "__main__":
-    test_lambertSolver(False, solver[1], revs[0], times[1], eccentricities[1], transferAngle[0], alignmentThreshold[0], 1e-2)
+    test_lambertSolver(False,
+                       solver[1],
+                       revs[0],
+                       times[1],
+                       eccentricities[1],
+                       transferAngle[0],
+                       alignmentThreshold[0],
+                       1e-2)
