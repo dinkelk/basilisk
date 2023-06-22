@@ -68,7 +68,7 @@ public:
     std::shared_ptr<Translation> createTranslationProperties(const std::shared_ptr<Point>& headPoint, const std::shared_ptr<Point>& tailPoint);
     std::shared_ptr<Rotation> createRotationProperties(const std::shared_ptr<Frame>& upperFrame, const std::shared_ptr<Frame>& lowerFrame);
     InertiaTensor createInertiaTensor(const std::shared_ptr<Point>& point);
-    std::shared_ptr<Assembly> createAssembly();
+    static std::shared_ptr<Assembly> createAssembly();
 
     std::shared_ptr<Node> findNode(const std::shared_ptr<Part>& part);
     void connect(const std::shared_ptr<Part>& lowerPart, const std::shared_ptr<Joint>& joint, const std::shared_ptr<Part>& upperPart);
