@@ -44,7 +44,17 @@ void EarthPoint::SelfInit(){
  */
 void EarthPoint::Reset(uint64_t CurrentSimNanos)
 {
-
+    if (!this->attNavInMsg.isLinked()) {
+        bskLogger.bskLog(BSK_ERROR, ".attNavInMsg wasn't connected.");
+    }
+    if (!this->transNavInMsg.isLinked()) {
+        bskLogger.bskLog(BSK_ERROR, ".transNavInMsg wasn't connected.");
+    }
+    if (!this->ephemerisInMsg.isLinked()) {
+        bskLogger.bskLog(BSK_ERROR, ".ephemerisInMsg wasn't connected.");
+    }
+    this->callCount = 0;
+    this->antennaCount = 1;
 }
 
 
