@@ -66,7 +66,83 @@ void EarthPoint::Reset(uint64_t CurrentSimNanos)
  */
 void EarthPoint::UpdateState(uint64_t CurrentSimNanos)
 {
-    
+    /*! create and zero the output message */
+    AttRefMsgPayload attRefOut = this->attRefOutMsg.zeroMsgPayload;
+
+    /*! read and allocate the input attitude navigation message */
+    NavAttMsgPayload attNavIn = this->attNavInMsg();
+
+    /*! read and allocate the input translational navigation message */
+    NavTransMsgPayload transNavIn = this->transNavInMsg();
+
+    /*! read and allocate the input ephemeris message */
+    EphemerisMsgPayload ephemerisIn = this->ephemerisInMsg();
+
+    /*! compute and allocate inertial requested heading */
+    double hReqHat_N[3];
+    v3Subtract(ephemerisIn.r_BdyZero_N, transNavIn.r_BN_N, hReqHat_N);
+    v3Normalize(hReqHat_N, hReqHat_N);
+
+    /*! define the body frame orientation DCM BN */
+    double BN[3][3];
+    MRP2C(attNavIn.sigma_BN, BN);
+
+    /*! normalize the solar array drive axis and sun constrained axis */
+    v3Normalize(this->a1Hat_B, this->a1Hat_B);
+    v3Normalize(this->a2Hat_B, this->a2Hat_B);
+
+    /*! normalize the antenna direction axes */
+    v3Normalize(this->h1Hat_B, this->h1Hat_B);
+    if (v3Norm(this->h2Hat_B) > epsilon) {
+        v3Normalize(this->h2Hat_B, this->h2Hat_B);
+        this->antennaCount = 2;
+    }
+
+    /*! read Sun direction in B frame from the attNav message */
+    double rHat_SB_B[3];
+    v3Copy(attNavIn.vehSunPntBdy, rHat_SB_B);
+
+    /*! map requested heading into B frame */
+    double hReqHat_B[3];
+    m33MultV3(BN, hReqHat_N, hReqHat_B);
+
+    /*! reference attitude DCM */
+    double RN[3][3];
+
+    /*! compute reference attitude for first antenna */
+    double R1N[3][3];
+    ComputeReferenceFrame(this->h1Hat_B, hReqHat_B, rHat_SB_B, BN, R1N);
+    m33Copy(R1N, RN);
+
+    /*! compute reference attitude for second antenna and choose solution */
+    if (this->antennaCount == 2) {
+        // compute second reference DCM
+        double R2N[3][3];
+        ComputeReferenceFrame(this->h2Hat_B, hReqHat_B, rHat_SB_B, BN, R2N);
+
+        ChooseReferenceFrame(R1N, R2N, BN, rHat_SB_B, RN);
+    }
+
+    /*! compute reference MRP */
+    double sigma_RN[3];
+    C2MRP(RN, sigma_RN);
+    v3Copy(sigma_RN, attRefOut.sigma_RN);
+
+    /*! compute reference angular rates and accelerations via finite differences */
+    double omega_RN_R[3], omegaDot_RN_R[3];
+    finiteDifferencesRatesAndAcc(sigma_RN, this->sigma_RN_1, this->sigma_RN_2, CurrentSimNanos,
+                                 this->T1NanoSeconds, this->T2NanoSeconds, this->callCount,
+                                 omega_RN_R, omegaDot_RN_R);
+
+    /*! compute angular rates and accelerations in N frame and store in buffer msg */
+    m33tMultV3(RN, omega_RN_R, attRefOut.omega_RN_N);
+    m33tMultV3(RN, omegaDot_RN_R, attRefOut.domega_RN_N);
+
+    /*! Write the output messages */
+    this->attRefOutMsg.write(&attRefOut, this->moduleID, CurrentSimNanos);
+
+    /*! Write the C-wrapped output messages */
+    AttRefMsg_C_write(&attRefOut, &this->attRefOutMsgC, this->moduleID, CurrentSimNanos);
 }
 
 
