@@ -45,6 +45,9 @@ public:
     void Reset(uint64_t CurrentSimNanos);
     void UpdateState(uint64_t CurrentSimNanos);
 
+    void ComputeReferenceFrame(double hRefHat_B[3], double hReqHat_B[3], double rHat_SB_B[3], double BN[3][3], double RN[3][3]);
+    void ChooseReferenceFrame(double R1N[3][3], double R2N[3][3], double BN[3][3], double rHat_SB_B[3], double RN[3][3]);
+
     AlignmentPriority alignmentPriority;                           //!< flag to indicate which flyby model is being used
     double            h1Hat_B[3];                                  //!< first antenna direction in B-frame coordinates
     double            h2Hat_B[3];                                  //!< optional antenna direction in B-frame coordinates
