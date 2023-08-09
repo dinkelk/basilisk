@@ -30,9 +30,20 @@ from Basilisk import __path__
 bskPath = __path__[0]
 fileName = os.path.basename(os.path.splitext(__file__)[0])
 
-from Basilisk.simulation import KinematicsEngine, Frame, Vector, Tensor, AttitudeParameterization, Part, Joint, Hinge
-from Basilisk.simulation import SixDOFRigidBody, spacecraft
-from Basilisk.utilities import SimulationBaseClass, macros, unitTestSupport
+# from Basilisk.simulation.KinematicsArchitecture import AttitudeParameterization
+from Basilisk.simulation.KinematicsArchitecture import KinematicsEngine
+from Basilisk.simulation.KinematicsArchitecture import Frame
+from Basilisk.simulation.KinematicsArchitecture import Vector
+from Basilisk.simulation.KinematicsArchitecture import Tensor
+from Basilisk.simulation.KinematicsArchitecture import Part
+from Basilisk.simulation.KinematicsArchitecture import Joint
+from Basilisk.simulation.KinematicsArchitecture import Hinge
+
+from Basilisk.simulation import SixDOFRigidBody
+from Basilisk.simulation import spacecraft
+from Basilisk.utilities import SimulationBaseClass
+from Basilisk.utilities import macros
+from Basilisk.utilities import unitTestSupport
 
 def test_SixDOFRigidBody(show_plots):
     r"""
@@ -65,7 +76,7 @@ def dynamicsEngine_SixDOFRigidBody(show_plots):
     #
     # Kinematics setup
     #
-    myKinematicsEngine = KinematicsEngine.KinematicsEngine()
+    myKinematicsEngine = KinematicsEngine()
     myInertialFrame = myKinematicsEngine.createFrame()
     myInertialFrame.tag = "inertial"
 

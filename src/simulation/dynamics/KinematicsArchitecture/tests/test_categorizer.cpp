@@ -17,7 +17,7 @@
 
  */
 
-#include "simulation/dynamics/_GeneralModuleFiles/Categorizer.h"
+#include "simulation/dynamics/KinematicsArchitecture/Categorizer.h"
 #include "simulation/dynamics/KinematicsArchitecture/KinematicsEngine.h"
 #include "architecture/utilities/linearAlgebra.h"
 #include "architecture/utilities/tests/unitTestComparators.h"
