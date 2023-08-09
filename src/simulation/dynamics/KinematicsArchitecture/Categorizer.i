@@ -16,9 +16,9 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
  */
-%module SixDOFRigidBody
+%module Categorizer
 %{
-   #include "../../_GeneralModuleFiles/SixDOFRigidBody.h"
+#include "simulation/dynamics/KinematicsArchitecture/Categorizer.h"
 
 %}
 
@@ -30,12 +30,10 @@ from Basilisk.architecture.swig_common_model import *
 %include "swig_conly_data.i"
 %include "std_vector.i"
 
-%include "sys_model.h"
-%include "simulation/dynamics/_GeneralModuleFiles/stateData.h"
-%include "simulation/dynamics/_GeneralModuleFiles/dynParamManager.h"
-%include "simulation/dynamics/_GeneralModuleFiles/dynamicObject.h"
-%include "simulation/dynamics/_GeneralModuleFiles/DynamicsEngine.h"
-%include "simulation/dynamics/_GeneralModuleFiles/SixDOFRigidBody.h"
+%include <std_shared_ptr.i>
+%shared_ptr(Categorizer)
+
+%include "simulation/dynamics/KinematicsArchitecture/Categorizer.h"
 
 %pythoncode %{
 import sys

@@ -20,7 +20,7 @@
 #include "architecture/utilities/avsEigenMRP.h"
 #include "architecture/utilities/avsEigenSupport.h"
 #include "architecture/utilities/macroDefinitions.h"
-#include "svIntegratorRK4.h"
+#include "simulation/dynamics/_GeneralModuleFiles/svIntegratorRK4.h"
 #include <iostream>
 #include <utility>
 

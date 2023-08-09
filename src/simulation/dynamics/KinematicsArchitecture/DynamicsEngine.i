@@ -16,9 +16,9 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
  */
-%module Categorizer
+%module DynamicsEngine
 %{
-#include "../../_GeneralModuleFiles/Categorizer.h"
+   #include "simulation/dynamics/KinematicsArchitecture/DynamicsEngine.h"
 
 %}
 
@@ -30,10 +30,11 @@ from Basilisk.architecture.swig_common_model import *
 %include "swig_conly_data.i"
 %include "std_vector.i"
 
-%include <std_shared_ptr.i>
-%shared_ptr(Categorizer)
-
-%include "../../_GeneralModuleFiles/Categorizer.h"
+%include "sys_model.h"
+%include "simulation/dynamics/_GeneralModuleFiles/stateData.h"
+%include "simulation/dynamics/_GeneralModuleFiles/dynParamManager.h"
+%include "simulation/dynamics/_GeneralModuleFiles/dynamicObject.h"
+%include "simulation/dynamics/KinematicsArchitecture/DynamicsEngine.h"
 
 %pythoncode %{
 import sys

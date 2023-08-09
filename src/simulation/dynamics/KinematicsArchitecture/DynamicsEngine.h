@@ -22,7 +22,7 @@
 
 #include <utility>
 
-#include "simulation/dynamics/KinematicsArchitecture//KinematicsEngine.h"
+#include "simulation/dynamics/KinematicsArchitecture/KinematicsEngine.h"
 #include "simulation/dynamics/_GeneralModuleFiles/dynamicObject.h"
 
 class DynamicsEngine: public DynamicObject {

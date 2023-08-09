@@ -16,22 +16,25 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
  */
-%module System
-%{
-    #include "../../_GeneralModuleFiles/System.h"
-%}
 
-%pythoncode %{
-from Basilisk.architecture.swig_common_model import *
-%}
-%include "std_string.i"
-%include "swig_eigen.i"
-%include "swig_conly_data.i"
-%include "std_vector.i"
+#ifndef CATEGORIZER_H
+#define CATEGORIZER_H
 
-%include "simulation/dynamics/_GeneralModuleFiles/System.h"
+#include "simulation/dynamics/KinematicsArchitecture/KinematicsEngine.h"
 
-%pythoncode %{
-import sys
-protectAllClasses(sys.modules[__name__])
-%}
+class Categorizer {
+public:
+    explicit Categorizer(int chainLength) : maxChainLength(chainLength) {};
+    ~Categorizer() = default;
+
+    int maxChainLength;
+
+    std::shared_ptr<Node> findBaseNode(const std::vector<std::shared_ptr<Node>>& nodeList);  // use std::optional here?
+
+private:
+    bool checkBase(const std::shared_ptr<Node>& node);
+    double search(const std::shared_ptr<Node>& node, const std::shared_ptr<Node>& parentNode);
+    void unvisitNodes(const std::vector<std::shared_ptr<Node>>& nodeList);
+};
+
+#endif

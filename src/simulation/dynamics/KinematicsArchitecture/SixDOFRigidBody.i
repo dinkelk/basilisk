@@ -16,9 +16,9 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
  */
-%module DynamicsEngine
+%module SixDOFRigidBody
 %{
-   #include "../../_GeneralModuleFiles/DynamicsEngine.h"
+   #include "simulation/dynamics/KinematicsArchitecture/SixDOFRigidBody.h"
 
 %}
 
@@ -34,7 +34,8 @@ from Basilisk.architecture.swig_common_model import *
 %include "simulation/dynamics/_GeneralModuleFiles/stateData.h"
 %include "simulation/dynamics/_GeneralModuleFiles/dynParamManager.h"
 %include "simulation/dynamics/_GeneralModuleFiles/dynamicObject.h"
-%include "simulation/dynamics/_GeneralModuleFiles/DynamicsEngine.h"
+%include "simulation/dynamics/KinematicsArchitecture/DynamicsEngine.h"
+%include "simulation/dynamics/KinematicsArchitecture/SixDOFRigidBody.h"
 
 %pythoncode %{
 import sys
