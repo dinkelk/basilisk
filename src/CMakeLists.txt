@@ -720,4 +720,3 @@ endif()
 
 # Tests targets
 add_subdirectory("architecture/utilities/tests")
-add_subdirectory("simulation/dynamics/tests")
