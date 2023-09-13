@@ -71,6 +71,8 @@ Version |release|
 - Created :ref:`sepPoint` to compute the reference attitude during SEP Point thrusting, with thruster alignment as
   first constraint, and interchangeable second and third constraint consisting in maximum sunlight incidence on the
   solar arrays, and keep-in constraint of a body-fixed direction around the Sun direction.
+- Added :ref:`scenarioMomentumDumpingZeroNetForce` scenario to illustrate momentum dumping without exerting a net force
+  on the spacecraft.
 
 Version 2.2.0 (June 28, 2023)
 -----------------------------
