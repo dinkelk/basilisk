@@ -17,14 +17,14 @@
 
  */
 
-#ifndef motorStepCountSimMsg_h
-#define motorStepCountSimMsg_h
+#ifndef motorStepCommandSimMsg_h
+#define motorStepCommandSimMsg_h
 
 
  /*! @brief Structure containing number of commandaed stepper motor steps */
 typedef struct {
     int stepsCommanded;        //!< Number of commanded stepper motor steps
-}MotorStepCountMsgPayload;
+}MotorStepCommandMsgPayload;
 
 
-#endif /* motorStepCountSimMsg_h */
+#endif /* motorStepCommandSimMsg_h */
