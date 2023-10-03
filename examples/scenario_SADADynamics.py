@@ -97,6 +97,9 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     spinningBody.theta2Init = 5 * macros.D2R
     spinningBody.k1 = 1.0
     spinningBody.k2 = 2.0
+    # Lock the lower body
+    lock1 = True
+    lock2 = False
     if lock1:
         spinningBody.theta1DotInit = 0 * macros.D2R
     else:
@@ -114,11 +117,9 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
 
     # Log the test module output message for data comparison
     stepperMotorDataLog = StepperMotorProfiler.stepperMotorOutMsg.recorder()
-    prescribedDataLog = StepperMotorProfiler.prescribedMotionOutMsg.recorder()
     theta1Data = spinningBody.spinningBodyOutMsgs[0].recorder()
     theta2Data = spinningBody.spinningBodyOutMsgs[1].recorder()
     scSim.AddModelToTask(simTaskName, stepperMotorDataLog)
-    scSim.AddModelToTask(simTaskName, prescribedDataLog)
     scSim.AddModelToTask(simTaskName, theta1Data)
     scSim.AddModelToTask(simTaskName, theta2Data)
 
@@ -136,9 +137,6 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     thetaDDot = (180 / np.pi) * stepperMotorDataLog.thetaDDot
     motorStepCount = stepperMotorDataLog.stepCount
     motorCommandedSteps = stepperMotorDataLog.stepsCommanded
-    sigma_FM = prescribedDataLog.sigma_FM
-    omega_FM_F = prescribedDataLog.omega_FM_F
-    omegaPrime_FM_F = prescribedDataLog.omegaPrime_FM_F
     theta1 = (180 / np.pi) * theta1Data.theta
     theta1Dot = (180 / np.pi) * theta1Data.thetaDot
     theta2 = (180 / np.pi) * theta2Data.theta
