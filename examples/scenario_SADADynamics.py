@@ -55,6 +55,18 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     # Create the spacecraft object
     scObject = spacecraft.Spacecraft()
     scObject.ModelTag = "spacecraftBody"
+    # Define mass properties of the rigid hub of the spacecraft
+    scObject.hub.mHub = 750.0
+    scObject.hub.r_BcB_B = [[0.0], [0.0], [1.0]]
+    scObject.hub.IHubPntBc_B = [[900.0, 0.0, 0.0], [0.0, 800.0, 0.0], [0.0, 0.0, 600.0]]
+    # Set the initial values for the states
+    scObject.hub.r_CN_NInit = [[-4020338.690396649], [7490566.741852513], [5248299.211589362]]
+    scObject.hub.v_CN_NInit = [[-5199.77710904224], [-3436.681645356935], [1041.576797498721]]
+    scObject.hub.sigma_BNInit = [[0.0], [0.0], [0.0]]
+    scObject.hub.omega_BN_BInit = [[0.01], [-0.01], [0.01]]
+
+    # Add the sc to the runtime call list
+    scSim.AddModelToTask(simTaskName, scObject)
 
     # Create an instance of the stepperMotorProfiler module to be tested
     StepperMotorProfiler = stepperMotorProfiler.stepperMotorProfiler()
@@ -81,36 +93,32 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     # Create an instance of the spinningBodyTwoDOF module
     spinningBody = spinningBodyTwoDOFStateEffector.SpinningBodyTwoDOFStateEffector()
     spinningBody.ModelTag = "SpinningBody"
-    spinningBody.mass1 = 100.0
-    spinningBody.mass2 = 50.0
-    spinningBody.IS1PntSc1_S1 = [[100.0, 0.0, 0.0], [0.0, 50.0, 0.0], [0.0, 0.0, 50.0]]
+    spinningBody.mass1 = 0.0  # lower body
+    spinningBody.mass2 = 100.0
+    spinningBody.IS1PntSc1_S1 = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
     spinningBody.IS2PntSc2_S2 = [[50.0, 0.0, 0.0], [0.0, 30.0, 0.0], [0.0, 0.0, 40.0]]
-    spinningBody.dcm_S10B = [[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]
-    spinningBody.dcm_S20S1 = [[0.0, -1.0, 0.0], [0.0, .0, -1.0], [1.0, 0.0, 0.0]]
-    spinningBody.r_Sc1S1_S1 = [[2.0], [-0.5], [0.0]]
-    spinningBody.r_Sc2S2_S2 = [[1.0], [0.0], [-1.0]]
+    spinningBody.dcm_S10B = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    spinningBody.dcm_S20S1 = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    spinningBody.r_Sc1S1_S1 = [[0.0], [0.0], [0.0]]
+    spinningBody.r_Sc2S2_S2 = [[1.0], [0.0], [0.0]]
     spinningBody.r_S1B_B = [[-2.0], [0.5], [-1.0]]
-    spinningBody.r_S2S1_S1 = [[0.5], [-1.5], [-0.5]]
-    spinningBody.s1Hat_S1 = [[0], [0], [1]]
-    spinningBody.s2Hat_S2 = [[0], [-1], [0]]
-    spinningBody.theta1Init = 0 * macros.D2R
-    spinningBody.theta2Init = 5 * macros.D2R
-    spinningBody.k1 = 1.0
-    spinningBody.k2 = 2.0
-    # Lock the lower body
-    lock1 = True
-    lock2 = False
-    if lock1:
-        spinningBody.theta1DotInit = 0 * macros.D2R
-    else:
-        spinningBody.theta1DotInit = 2.0 * macros.D2R
-    if lock2:
-        spinningBody.theta2DotInit = 0 * macros.D2R
-    else:
-        spinningBody.theta2DotInit = -1.0 * macros.D2R
+    spinningBody.r_S2S1_S1 = [[0.0], [0.0], [0.0]]
+    spinningBody.s1Hat_S1 = [[1.0], [0], [0.0]]  # torsional axis
+    spinningBody.s2Hat_S2 = [[0.0], [1.0], [0.0]]  # bending axis
+    spinningBody.theta1Init = initialMotorAngle  # initial torsional angle
+    spinningBody.theta2Init = 0.01  # should be very small, bending
+
+    # Define spring and damper terms
+    omega_n_1 = 2 * np.pi * 0.5  # natural freq
+    omega_n_2 = 2 * np.pi * 0.6  # natural freq
+    Q = 30.0
+    spinningBody.k1 = (omega_n_1**2) * spinningBody.IS2PntSc2_S2[0][0]
+    spinningBody.k2 = (omega_n_2**2) * spinningBody.IS2PntSc2_S2[1][1]
+    spinningBody.c1 = omega_n_1 / Q
+    spinningBody.c2 = omega_n_2 / Q
 
     # Connect stepperMotorProfiler output message to the spinningBodyTwoDOF input message
-    spinningBody.spinningBodyInMsg.subscribeTo(stepperMotorProfiler.hingedRigidBodyOutMsg)
+    spinningBody.spinningBodyRefInMsgs[0].subscribeTo(StepperMotorProfiler.hingedRigidBodyOutMsg)
 
     # Add spinning body to spacecraft
     scObject.addStateEffector(spinningBody)
