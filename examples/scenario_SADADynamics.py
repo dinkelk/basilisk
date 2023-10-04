@@ -48,7 +48,7 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     scSim = SimulationBaseClass.SimBaseClass()
 
     # Create the test thread
-    testProcessRate = macros.sec2nano(0.1)     # Set process rate update time
+    testProcessRate = macros.sec2nano(0.001)     # Set process rate update time
     testProc = scSim.CreateNewProcess(simProcessName)
     testProc.addTask(scSim.CreateNewTask(simTaskName, testProcessRate))
 
@@ -58,7 +58,7 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     # Define mass properties of the rigid hub of the spacecraft
     scObject.hub.mHub = 750.0
     scObject.hub.r_BcB_B = [[0.0], [0.0], [1.0]]
-    scObject.hub.IHubPntBc_B = [[900.0, 0.0, 0.0], [0.0, 800.0, 0.0], [0.0, 0.0, 600.0]]
+    scObject.hub.IHubPntBc_B = [[2000.0, 0.0, 0.0], [0.0, 1000.0, 0.0], [0.0, 0.0, 1500.0]]
     # Set the initial values for the states
     scObject.hub.r_CN_NInit = [[-4020338.690396649], [7490566.741852513], [5248299.211589362]]
     scObject.hub.v_CN_NInit = [[-5199.77710904224], [-3436.681645356935], [1041.576797498721]]
@@ -96,7 +96,7 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     spinningBody.mass1 = 0.0  # lower body
     spinningBody.mass2 = 100.0
     spinningBody.IS1PntSc1_S1 = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-    spinningBody.IS2PntSc2_S2 = [[50.0, 0.0, 0.0], [0.0, 30.0, 0.0], [0.0, 0.0, 40.0]]
+    spinningBody.IS2PntSc2_S2 = [[300.0, 0.0, 0.0], [0.0, 200.0, 0.0], [0.0, 0.0, 500.0]]
     spinningBody.dcm_S10B = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
     spinningBody.dcm_S20S1 = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
     spinningBody.r_Sc1S1_S1 = [[0.0], [0.0], [0.0]]
@@ -109,9 +109,9 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     spinningBody.theta2Init = 0.01  # should be very small, bending
 
     # Define spring and damper terms
-    omega_n_1 = 2 * np.pi * 0.5  # natural freq
-    omega_n_2 = 2 * np.pi * 0.6  # natural freq
-    Q = 30.0
+    omega_n_1 = 2 * np.pi * 5  # natural freq
+    omega_n_2 = 2 * np.pi * 15  # natural freq
+    Q = 0.1
     spinningBody.k1 = (omega_n_1**2) * spinningBody.IS2PntSc2_S2[0][0]
     spinningBody.k2 = (omega_n_2**2) * spinningBody.IS2PntSc2_S2[1][1]
     spinningBody.c1 = omega_n_1 / Q
@@ -122,6 +122,9 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
 
     # Add spinning body to spacecraft
     scObject.addStateEffector(spinningBody)
+
+    # Add the spinning body module to the runtime call list
+    scSim.AddModelToTask(simTaskName, spinningBody)
 
     # Log the test module output message for data comparison
     stepperMotorDataLog = StepperMotorProfiler.stepperMotorOutMsg.recorder()
@@ -192,8 +195,8 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
 if __name__ == "__main__":
     run(
         True,
-        0.0,                       # initialMotorAngle
+        0.0 * (np.pi / 180),       # initialMotorAngle
         10,                        # stepsCommanded
-        1.0 * (np.pi / 180),       # stepAngle
-        1.0,                       # stepTime
+        0.5 * (np.pi / 180),       # stepAngle
+        0.1,                       # stepTime
     )
