@@ -111,11 +111,11 @@ def run(show_plots, initialMotorAngle, stepsCommanded, stepAngle, stepTime):
     # Define spring and damper terms
     omega_n_1 = 2 * np.pi * 5  # natural freq
     omega_n_2 = 2 * np.pi * 15  # natural freq
-    Q = 0.1
+    Q = 30
     spinningBody.k1 = (omega_n_1**2) * spinningBody.IS2PntSc2_S2[0][0]
     spinningBody.k2 = (omega_n_2**2) * spinningBody.IS2PntSc2_S2[1][1]
-    spinningBody.c1 = omega_n_1 / Q
-    spinningBody.c2 = omega_n_2 / Q
+    spinningBody.c1 = (omega_n_1 / Q) * spinningBody.IS2PntSc2_S2[0][0]
+    spinningBody.c2 = (omega_n_2 / Q) * spinningBody.IS2PntSc2_S2[1][1]
 
     # Connect stepperMotorProfiler output message to the spinningBodyTwoDOF input message
     spinningBody.spinningBodyRefInMsgs[0].subscribeTo(StepperMotorProfiler.hingedRigidBodyOutMsg)
