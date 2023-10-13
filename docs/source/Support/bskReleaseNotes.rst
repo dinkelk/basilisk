@@ -85,6 +85,7 @@ Version |release|
 - updated macOS `cspice` library to be compiled with Xcode 15.  This addresses some errors that appeared
   when calling the prior pre-built `cspice` library.  The new library is backwards compatible with
   prior versions of Xcode.
+- Updated :ref:`thrusterPlatformReference` to add an integral feedback term which dumps steady-state momentum in case of uncertainties on the CM location.
 
 Version 2.2.0 (June 28, 2023)
 -----------------------------
