@@ -22,7 +22,8 @@
 #include <vector>
 #include <stdint.h>
 #include <set>
-#include <thread>
+#include <memory>
+// #include <thread>
 // #include <mutex>
 // #include <condition_variable>
 #include <iostream>
@@ -62,7 +63,7 @@ public:
     uint64_t stopThreadNanos;   //!< Current stop conditions for the thread
     int64_t stopThreadPriority; //!< Current stop priority for thread
     uint64_t threadID;          //!< Identifier for thread
-    std::thread *threadContext; //!< std::thread data for concurrent execution
+    // std::thread *threadContext; //!< std::thread data for concurrent execution
     uint64_t CurrentNanos;  //!< [ns] Current sim time
     uint64_t NextTaskTime;  //!< [ns] time for the next Task
     int64_t nextProcPriority;  //!< [-] Priority level for the next process

@@ -10,6 +10,12 @@ extern "C" {
     #include "benchPlatform.h"
 }
 
+// C++ needs this little handle on bare metal
+// https://arobenko.github.io/bare_metal_cpp/
+#ifdef MY_RV32
+void* __dso_handle = nullptr;
+#endif
+
 uint8_t getPixelFromImage(uint16_t row, uint16_t column, Image *image);
 
 int main (int argc, char* argv[] ) {

@@ -125,13 +125,18 @@ target_include_directories(SimulationDriver PRIVATE
   "${CMAKE_SOURCE_DIR}/../.."
   "${CMAKE_SOURCE_DIR}/../eigen"
   "/share/basilisk/dist3/autoSource"
-  "/share/ema-fsw-simple-benchmark/"
+  #"/share/ema-fsw-simple-benchmark/"
   # IMAF
   "/share/ema-fsw-simple-benchmark/RV32imaf"
   "/share/ema-fsw-simple-benchmark/RV32imaf/platform"
   # IMC
   #"/share/ema-fsw-simple-benchmark/RV32imc"
   #"/share/ema-fsw-simple-benchmark/RV32imc/platform"
+  # NOEL
+  "/share/ema-fsw-simple-benchmark-noel/"
+  "/share/ema-fsw-simple-benchmark-noel/RV32noel/libbcc/shared/include"
+  "/share/ema-fsw-simple-benchmark-noel/RV32noel/libbcc/bsp/2020q4/include"
+  "/share/ema-fsw-simple-benchmark-noel/RV32noel/libbcc/shared/inc"
 )
 
 set_target_properties(SimulationDriver PROPERTIES FOLDER "${DIR_NAME_STRING}")
