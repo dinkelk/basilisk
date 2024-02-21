@@ -91,7 +91,7 @@ SimThreadExecution::SimThreadExecution() {
     NextTaskTime = 0;
     stopThreadNanos=0;
     nextProcPriority = -1;
-    threadContext = nullptr;
+    // threadContext = nullptr;
 
 }
 
@@ -182,13 +182,15 @@ void SimThreadExecution::StepUntilStop()
      SimStopTime, then the inPri shouldn't come into effect, so set it to -1
      (that's less than all process priorities, so it will run through the next
      process)*/
-    int64_t inPri = stopThreadNanos == this->NextTaskTime ? stopThreadPriority : -1;
+    //int64_t inPri = stopThreadNanos == this->NextTaskTime ? stopThreadPriority : -1;
+    int64_t inPri = -1;
+
     // while(this->threadValid() && (this->NextTaskTime < stopThreadNanos || (this->NextTaskTime == stopThreadNanos &&
     //                                            this->nextProcPriority >= stopThreadPriority)) )
     while(this->threadValid())
     {
         
-        // std::cout << "single step processes" << std::endl;
+        // std::cout << "single step processes" << inPri << std::endl;
         begin_Benchmark(DOT_I16);
         this->SingleStepProcesses(inPri);
         end_Benchmark(DOT_I16);
@@ -529,10 +531,10 @@ void SimModel::deleteThreads() {
     {
         (*thrIt)->killThread();
         (*thrIt)->unlockThread();
-        if((*thrIt)->threadContext && (*thrIt)->threadContext->joinable()) {
-            (*thrIt)->threadContext->join();
-            delete (*thrIt)->threadContext;
-        }
+        // if((*thrIt)->threadContext && (*thrIt)->threadContext->joinable()) {
+        //     (*thrIt)->threadContext->join();
+        //     delete (*thrIt)->threadContext;
+        // }
         delete (*thrIt);
     }
     this->threadList.clear();
